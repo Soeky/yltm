@@ -1,0 +1,69 @@
+name: Flutter CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  flutter_build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        platform: [android, web, linux]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.4'  # Passe dies an deine Version an
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test
+
+      # Android Build
+      - name: Build Android APK
+        if: matrix.platform == 'android'
+        run: flutter build apk --release
+
+      # Web Build
+      - name: Build Web App
+        if: matrix.platform == 'web'
+        run: flutter build web
+
+      # Linux Build
+      - name: Build Linux Application
+        if: matrix.platform == 'linux'
+        run: flutter build linux
+
+      # Optional: Artifacts hochladen
+      - name: Upload Android APK
+        if: matrix.platform == 'android' && success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release.apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Upload Web Build
+        if: matrix.platform == 'web' && success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-build
+          path: build/web
+
+      - name: Upload Linux Build
+        if: matrix.platform == 'linux' && success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-build
+          path: build/linux
