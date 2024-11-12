@@ -1,7 +1,7 @@
 CREATE TABLE tasks(
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id),
-  title VARCHAR(100)NOTNULL,
+  title VARCHAR(100) NOT NULL,
   due_date TIMESTAMP,
   completed BOOLEAN DEFAULT FALSE
 );

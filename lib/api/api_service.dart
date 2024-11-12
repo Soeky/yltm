@@ -3,16 +3,26 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String _baseUrl = 'http://131.159.223.70:8080';
+  static const String _baseUrl = 'http://131.159.210.124:8080';
 
   Future<List<dynamic>> getTasks(int userId) async {
     final response = await http.get(Uri.parse('$_baseUrl/tasks?user_id=$userId'));
-    return jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) ?? [];  // Auch hier leere Liste bei fehlenden Daten
+    } else {
+      throw Exception('Failed to load tasks');
+    }
   }
 
   Future<List<dynamic>> getEvents(int userId) async {
     final response = await http.get(Uri.parse('$_baseUrl/events?user_id=$userId'));
-    return jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) ?? [];  // Falls die Antwort leer ist, wird eine leere Liste zurückgegeben
+    } else {
+      throw Exception('Failed to load events');
+    }
   }
 
   Future<void> createTask(int userId, String title, String dueDate) async {

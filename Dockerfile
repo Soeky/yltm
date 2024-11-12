@@ -11,8 +11,10 @@ COPY backend/ .
 RUN go mod download
 RUN go build -o server main.go
 
-# Final Image
-FROM gcr.io/distroless/base-debian10
+
+# Final Stage with Alpine
+FROM alpine:latest
+RUN apk --no-cache add libc6-compat  # Fügt GLIBC-Kompatibilität hinzu
 COPY --from=builder /app/backend/server /server
 
 EXPOSE 8080
